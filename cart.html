@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart – Crystal Custom Embroidery of Raunds</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="logo">Crystal Custom Embroidery</a>
+  <nav class="main-nav">
+  <a href="collections/polos-category.html">Polos</a>
+  <a href="collections/hoodies-sweatshirts-category.html">Hoodies &amp; Sweatshirts</a>
+  <a href="collections/fleeces-category.html">Fleeces</a>
+  <a href="collections/gilets-jackets-category.html">Gilets &amp; Jackets</a>
+  <a href="collections/headwear-category.html">Headwear</a>
+  <a href="collections/leavers-category.html">Leavers</a>
+  <a href="faq.html">FAQ</a>
+</nav>
+  <a href="cart.html" class="cart-icon" aria-label="View cart">
+    &#128722;<span id="cart-count" class="cart-badge">0</span>
+  </a>
+</header>
+
+<div class="breadcrumb"><a href="index.html">Home</a> / Your Cart</div>
+
+<div class="cart-page">
+  <h2>Your Cart</h2>
+  <p style="color:#6b6459; font-size:0.9rem;">Add items from any product page, then send the whole list to us on WhatsApp for a quote — we'll confirm final pricing, sizes and payment with you directly.</p>
+
+  <div id="cart-empty" class="cart-empty" style="display:none;">
+    Your cart is empty. Browse the range using the menu above and click <strong>Add to Cart</strong> on anything you like.
+  </div>
+
+  <div id="cart-list"></div>
+
+  <div id="cart-summary" class="cart-summary" style="display:none;">
+    <div class="cart-summary-row">
+      <span>Total</span>
+      <span id="cart-total">£0.00</span>
+    </div>
+    <a id="cart-whatsapp-btn" class="whatsapp-btn whatsapp-btn--large" href="#" target="_blank" rel="noopener">💬 Send My Cart on WhatsApp</a>
+    <button class="clear-cart-btn" type="button" onclick="clearCart()">Empty Cart</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  &copy; 2026 Crystal Custom Embroidery of Raunds. All work carried out in-store.
+  <div class="legal-links">
+    <a href="privacy-policy.html">Privacy Policy</a> ·
+    <a href="terms-of-service.html">Terms of Service</a> ·
+    <a href="shipping-policy.html">Shipping Policy</a> ·
+    <a href="refund-policy.html">Refund Policy</a> ·
+    <a href="cookie-policy.html">Cookie Preferences</a>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
+<script>
+  renderCartPage();
+</script>
+
+</body>
+</html>

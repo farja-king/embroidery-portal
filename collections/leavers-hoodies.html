@@ -174,31 +174,34 @@
 <script src="../assets/main.js"></script>
 <script>
   const IMG_BASE = "https://www.fullcollection.com/storage/phoenix/2026/Phoenix%20All%20Images/Just%20Hoods/Product%20Images/JH001/ProductCarouselMain/";
+  const TSHIRT_IMG_BASE = "https://www.fullcollection.com/storage/phoenix/2026/Phoenix%20All%20Images/Fruit%20of%20the%20Loom/Product%20Images/SS12/ProductCarouselMain/";
   // Unified with the Leavers T-Shirt's 20 colours (SS12/SS12B) so customers
   // see the same colour names on both products. Each entry's display name
-  // matches the T-shirt's colour name; the image/code is whichever JH001
-  // hoodie colourway is the closest available match to that shade.
+  // matches the T-shirt's colour name; img is whichever JH001 hoodie
+  // colourway is the closest available match (used for the main product
+  // photo); swatchImg reuses the T-shirt's flat colour photo for the small
+  // round swatch icons, which look cleaner than the hoodie garment photos.
   const colours = [
-    { name: "Black", img: IMG_BASE + "JH001%20CHA%20FRONT.jpg" },
-    { name: "White", img: IMG_BASE + "JH001%20ACW%20FRONT.jpg" },
-    { name: "Sky Blue", img: IMG_BASE + "JH001%20SKY%20FRONT.jpg" },
-    { name: "Azure", img: IMG_BASE + "JH001%20HWB%20FRONT.jpg" },
-    { name: "Deep Navy", img: IMG_BASE + "JH001%20NYS%20FRONT.jpg" },
-    { name: "Navy", img: IMG_BASE + "JH001%20IKB%20FRONT.jpg" },
-    { name: "Royal Blue", img: IMG_BASE + "JH001%20ROY%20FRONT.jpg" },
-    { name: "Purple", img: IMG_BASE + "JH001%20PUR%20FRONT.jpg" },
-    { name: "Bottle Green", img: IMG_BASE + "JH001%20BOT%20FRONT.jpg" },
-    { name: "Kelly Green", img: IMG_BASE + "JH001%20SPG%20FRONT.jpg" },
-    { name: "Lime Green", img: IMG_BASE + "JH001%20LIM%20FRONT.jpg" },
-    { name: "Classic Olive", img: IMG_BASE + "JH001%20ERG%20FRONT.jpg" },
-    { name: "Light Graphite", img: IMG_BASE + "JH001%20SHK%20FRONT.jpg" },
-    { name: "Heather Grey", img: IMG_BASE + "JH001%20MOG%20FRONT.jpg" },
-    { name: "Red", img: IMG_BASE + "JH001%20FIR%20FRONT.jpg" },
-    { name: "Burgundy", img: IMG_BASE + "JH001%20BGS%20FRONT.jpg" },
-    { name: "Orange", img: IMG_BASE + "JH001%20BOR%20FRONT.jpg" },
-    { name: "Sunflower", img: IMG_BASE + "JH001%20GOL%20FRONT.jpg" },
-    { name: "Fuchsia", img: IMG_BASE + "JH001%20HPK%20FRONT.jpg" },
-    { name: "Yellow", img: IMG_BASE + "JH001%20SNY%20FRONT.jpg" }
+    { name: "Black", img: IMG_BASE + "JH001%20CHA%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20BLK%20FRONT.jpg" },
+    { name: "White", img: IMG_BASE + "JH001%20ACW%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20WHI%20FRONT.jpg" },
+    { name: "Sky Blue", img: IMG_BASE + "JH001%20SKY%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20SKY%20FRONT.jpg" },
+    { name: "Azure", img: IMG_BASE + "JH001%20HWB%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20AZR%20FRONT.jpg" },
+    { name: "Deep Navy", img: IMG_BASE + "JH001%20NYS%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20DNA%20FRONT.jpg" },
+    { name: "Navy", img: IMG_BASE + "JH001%20IKB%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20NAV%20FRONT.jpg" },
+    { name: "Royal Blue", img: IMG_BASE + "JH001%20ROY%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20ROY%20FRONT.jpg" },
+    { name: "Purple", img: IMG_BASE + "JH001%20PUR%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20PUR%20FRONT.jpg" },
+    { name: "Bottle Green", img: IMG_BASE + "JH001%20BOT%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20BOT%20FRONT.jpg" },
+    { name: "Kelly Green", img: IMG_BASE + "JH001%20SPG%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20KEL%20FRONT.jpg" },
+    { name: "Lime Green", img: IMG_BASE + "JH001%20LIM%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20LIM%20FRONT.jpg" },
+    { name: "Classic Olive", img: IMG_BASE + "JH001%20ERG%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20COL%20FRONT.jpg" },
+    { name: "Light Graphite", img: IMG_BASE + "JH001%20SHK%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20LGP%20FRONT.jpg" },
+    { name: "Heather Grey", img: IMG_BASE + "JH001%20MOG%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20HEA%20FRONT.jpg" },
+    { name: "Red", img: IMG_BASE + "JH001%20FIR%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20RED%20FRONT.jpg" },
+    { name: "Burgundy", img: IMG_BASE + "JH001%20BGS%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20BUR%20FRONT.jpg" },
+    { name: "Orange", img: IMG_BASE + "JH001%20BOR%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20ORA%20FRONT.jpg" },
+    { name: "Sunflower", img: IMG_BASE + "JH001%20GOL%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20SUN%20FRONT.jpg" },
+    { name: "Fuchsia", img: IMG_BASE + "JH001%20HPK%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20FUS%20FRONT.jpg" },
+    { name: "Yellow", img: IMG_BASE + "JH001%20SNY%20FRONT.jpg", swatchImg: TSHIRT_IMG_BASE + "SS12%20YEL%20FRONT.jpg" }
   ];
 
   const swatchContainer = document.getElementById("swatches");
@@ -226,7 +229,7 @@
   colours.forEach((c, i) => {
     const btn = document.createElement("button");
     btn.className = "swatch" + (i === 0 ? " selected" : "");
-    btn.style.backgroundImage = `url(${c.img})`;
+    btn.style.backgroundImage = `url(${c.swatchImg})`;
     btn.title = c.name;
     btn.type = "button";
     btn.addEventListener("click", () => selectColour(c, btn));

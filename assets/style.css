@@ -411,6 +411,19 @@ footer.site-footer {
   color: var(--ink);
 }
 
+.sizing-guide-link {
+  margin: 0.75rem 0 0;
+}
+
+.sizing-guide-link a {
+  color: var(--accent-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sizing-guide-link a:hover { text-decoration: underline; }
+
 .colour-swatches {
   display: flex;
   flex-wrap: wrap;

@@ -1,14 +1,14 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leavers T-Shirts – Crystal Custom Embroidery of Raunds</title>
 <link rel="stylesheet" href="../assets/style.css">
+<script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 </head>
 <body>
 <div class="announcement-bar" id="announcement-bar">Crystal Custom Embroidery</div>
-
 
 <header class="site-header">
   <a href="../index.html" class="logo">Crystal Custom Embroidery</a>
@@ -23,14 +23,137 @@
 </nav>
   <a href="../cart.html" class="cart-icon" aria-label="View cart">
     &#128722;<span id="cart-count" class="cart-badge">0</span>
-  </a></header>
+  </a>
+</header>
 
 <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="leavers-category.html">Leavers</a> / Leavers T-Shirts</div>
 
-<section class="popular">
-  <h2>Leavers T-Shirts</h2>
-  <p style="color:#6b6459;">Coming soon — check back shortly, or <a href="https://wa.me/447530576197?text=Hi%2C%20I%27d%20like%20to%20ask%20about%20leavers%20t-shirts." target="_blank" rel="noopener">ask us on WhatsApp</a> in the meantime.</p>
-</section>
+<div class="product-page">
+  <div class="product-image">
+    <img id="product-photo" src="../assets/leavers-images/tshirt-mockup.png" alt="Leavers T-Shirt full back design">
+  </div>
+
+  <div class="product-details">
+    <h1>Leavers T-Shirt</h1>
+    <div class="code">LEAVERS-TSHIRT &mdash; <span id="colour-name">Jet Black</span></div>
+    <div class="price">£10.00 per t-shirt</div>
+    <p style="color:#6b6459; font-size:0.9rem;">Includes a full back leavers design. Optional left chest printed school logo. This is a guide price for a quote &mdash; we'll confirm your final total based on quantity and options.</p>
+
+    <div class="colour-swatches" id="swatches"></div>
+
+    <div class="size-field">
+      <label for="size-select">Size</label>
+      <select id="size-select">
+        <optgroup label="Kids">
+          <option>3-4</option>
+          <option>5-6</option>
+          <option>7-8</option>
+          <option>9-11</option>
+          <option>12-13</option>
+        </optgroup>
+        <optgroup label="Adult">
+          <option selected>XS</option>
+          <option>S</option>
+          <option>M</option>
+          <option>L</option>
+          <option>XL</option>
+          <option>2XL</option>
+          <option>3XL</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <p class="min-order-note">Fill in the details below once — they'll apply to every Leavers T-Shirt size/colour you add to your cart, so you only need to enter them a single time per order.</p>
+
+    <div class="form-field">
+      <label for="leavers-year">Back Leavers Year</label>
+      <select id="leavers-year">
+        <option value="">Select year...</option>
+        <option>2026</option>
+        <option>2027</option>
+        <option>2028</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="names-in-year">Names Inside Large Year</label>
+      <select id="names-in-year">
+        <option value="">Select...</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="print-colour">Print Colour</label>
+      <select id="print-colour">
+        <option value="">Select colour...</option>
+        <option>White</option>
+        <option>Black</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="school-crest">School Crest to Left Chest</label>
+      <select id="school-crest">
+        <option value="">Select...</option>
+        <option>No</option>
+        <option>Not Sure</option>
+        <option>Yes</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="school-group">School / Group</label>
+      <input type="text" id="school-group" placeholder="e.g. Raunds Academy Year 11">
+    </div>
+
+    <div class="form-field">
+      <label for="order-notes">Notes</label>
+      <textarea id="order-notes" placeholder="Any requests we should know about, including a colour request if it's not in the list above"></textarea>
+    </div>
+
+    <div class="form-field">
+      <label for="qty-input">Quantity</label>
+      <input type="number" id="qty-input" min="1" value="10">
+      <span class="field-hint">Enter any quantity per colour/size &mdash; the 10-unit minimum applies to your whole order, not each line.</span>
+    </div>
+
+    <div class="min-order-note">This is a bulk quote request — minimum order 10 units across your whole order (you can mix sizes and colours to reach it). We'll confirm final pricing, proof and payment with you directly.</div>
+
+    <ul class="specs">
+      <li>Includes FULL back leavers design</li>
+      <li>Optional names inside the number</li>
+      <li>Print colour: White or Black only</li>
+      <li>Optional: left chest printed school logo</li>
+      <li>Signed proof required before production</li>
+      <li>Turnaround: 14 days from proof approval</li>
+      <li>Faults/incorrect items: report within 48 hours</li>
+      <li>No sleeve printing offered</li>
+    </ul>
+
+    <div class="upload-box">
+      <p>Only need to upload your logo once per order.</p>
+      <p style="font-size:0.8rem; color:#6b6459; margin-top:-0.5rem;">Accepted: JPG, PNG, or PDF, up to 15MB.</p>
+      <button id="upload-btn" type="button">Upload your logo image</button>
+      <div class="upload-status" id="upload-status"></div>
+    </div>
+
+    <div class="upload-box">
+      <p>Upload supporting docs — e.g. a name list or artwork brief.</p>
+      <p style="font-size:0.8rem; color:#6b6459; margin-top:-0.5rem;">Accepted: PDF, CSV, Excel, or Word files, up to 15MB.</p>
+      <button id="docs-upload-btn" type="button">Upload supporting docs</button>
+      <div class="upload-status" id="docs-upload-status"></div>
+    </div>
+
+    <p style="font-size:0.85rem; color:#6b6459; margin-bottom:0.75rem;">Add each size/colour combination you need separately — they'll be itemized in your cart.</p>
+
+    <button class="add-to-cart-btn" type="button" onclick="addLeaversItemToCart('cart-status')">&#128722; Add to Cart</button>
+    <div class="upload-status" id="cart-status"></div>
+
+    <a class="whatsapp-btn whatsapp-btn--large" href="../cart.html">View Cart &amp; Send Quote</a>
+  </div>
+</div>
 
 <footer class="site-footer">
   &copy; 2026 Crystal Custom Embroidery of Raunds. All work carried out in-store.
@@ -43,8 +166,59 @@
   </div>
 </footer>
 
-
 <script src="../assets/main.js"></script>
+<script>
+  // Same named colour range as the Leavers Hoodie (JH001) — flat swatches here
+  // since we don't have a confirmed garment photo source for this style.
+  const colours = [
+    { name: "Jet Black", hex: "#000000" },
+    { name: "White", hex: "#ffffff" },
+    { name: "Navy (Oxford)", hex: "#041848" },
+    { name: "Sapphire Blue", hex: "#0380ff" },
+    { name: "Royal Blue", hex: "#003cf0" },
+    { name: "Purple", hex: "#2402e0" },
+    { name: "Fire Red", hex: "#da0043" },
+    { name: "Burnt Orange", hex: "#fa2d0f" },
+    { name: "Heather Grey", hex: "#a2a9a8" },
+    { name: "Burgundy", hex: "#45002e" },
+    { name: "Kelly Green", hex: "#0b9900" },
+    { name: "Bottle Green", hex: "#105017" },
+    { name: "Sun Yellow", hex: "#ffe800" },
+    { name: "Gold", hex: "#ffb821" }
+  ];
+
+  const swatchContainer = document.getElementById("swatches");
+  const colourNameEl = document.getElementById("colour-name");
+  const qtyInput = document.getElementById("qty-input");
+
+  function selectColour(c, btn) {
+    colourNameEl.textContent = c.name;
+    document.querySelectorAll(".swatch").forEach(s => s.classList.remove("selected"));
+    btn.classList.add("selected");
+  }
+
+  colours.forEach((c, i) => {
+    const btn = document.createElement("button");
+    btn.className = "swatch" + (i === 0 ? " selected" : "");
+    btn.style.background = c.hex;
+    btn.title = c.name;
+    btn.type = "button";
+    btn.addEventListener("click", () => selectColour(c, btn));
+    swatchContainer.appendChild(btn);
+  });
+
+  qtyInput.addEventListener("change", () => {
+    qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+  });
+
+  initUploadWidget("upload-btn", "upload-status", "customer-designs/leavers-tshirts", (url) => {
+    saveLeaversDetails({ logoUrl: url });
+  });
+
+  initDocsUploadWidget("docs-upload-btn", "docs-upload-status", "customer-docs/leavers-tshirts", (url) => {
+    saveLeaversDetails({ docsUrl: url });
+  });
+</script>
 
 </body>
 </html>

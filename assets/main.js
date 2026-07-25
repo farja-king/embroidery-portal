@@ -238,4 +238,24 @@ function buildCartMessage(cart) {
   return `Hi, I'd like to enquire about the following items:\n\n${lines.join("\n")}\n\nTotal: £${total}`;
 }
 
+// Top-of-page rotating announcement bar (mirrors the old Shopify site's banner)
+function initAnnouncementBar() {
+  const el = document.getElementById("announcement-bar");
+  if (!el) return;
+  const messages = [
+    "Crystal Custom Embroidery",
+    "Based in Raunds — The Home of Embroidery Products"
+  ];
+  let i = 0;
+  setInterval(() => {
+    el.style.opacity = "0";
+    setTimeout(() => {
+      i = (i + 1) % messages.length;
+      el.textContent = messages[i];
+      el.style.opacity = "1";
+    }, 400);
+  }, 5000);
+}
+
 updateCartBadge();
+initAnnouncementBar();

@@ -35,29 +35,34 @@
 
   <div class="product-details">
     <h1>Leavers T-Shirt</h1>
-    <div class="code">LEAVERS-TSHIRT &mdash; <span id="colour-name">Jet Black</span></div>
+    <div style="color:#6b6459; font-size:0.9rem; margin-bottom:0.25rem;">140&ndash;145 gsm</div>
+    <div class="code"><span id="style-code">SS12</span> &mdash; <span id="colour-name">Black</span></div>
     <div class="price">£10.00 per t-shirt</div>
-    <p style="color:#6b6459; font-size:0.9rem;">Includes a full back leavers design. Optional left chest printed school logo. This is a guide price for a quote &mdash; we'll confirm your final total based on quantity and options.</p>
+    <p style="color:#6b6459; font-size:0.9rem;">Includes a full back leavers design. Optional left chest printed school logo. This is a guide price for a quote &mdash; we'll confirm your final total based on quantity and options. Adult sizes are style SS12; kids sizes are style SS12B &mdash; same 20 colours across both.</p>
+
+    <div class="sizing-guide-link"><a id="sizing-guide-btn" href="../assets/sizing-guides/ss12.pdf" target="_blank" rel="noopener">📐 Download Sizing Guide</a></div>
+
+    <p style="font-size:0.8rem; color:#6b6459; margin-bottom:0.5rem;">Colours are matched as closely as possible to our Leavers Hoodie range, but exact shades may vary slightly between products.</p>
 
     <div class="colour-swatches" id="swatches"></div>
 
     <div class="size-field">
       <label for="size-select">Size</label>
       <select id="size-select">
-        <optgroup label="Kids">
+        <optgroup label="Kids (SS12B)">
           <option>3-4</option>
           <option>5-6</option>
           <option>7-8</option>
           <option>9-11</option>
           <option>12-13</option>
+          <option>14-15</option>
         </optgroup>
-        <optgroup label="Adult">
-          <option selected>XS</option>
-          <option>S</option>
+        <optgroup label="Adult (SS12)">
+          <option selected>S</option>
           <option>M</option>
           <option>L</option>
           <option>XL</option>
-          <option>2XL</option>
+          <option>XXL</option>
           <option>3XL</option>
         </optgroup>
       </select>
@@ -168,30 +173,71 @@
 
 <script src="../assets/main.js"></script>
 <script>
-  // Same named colour range as the Leavers Hoodie (JH001) — flat swatches here
-  // since we don't have a confirmed garment photo source for this style.
+  // SS12 (adult) and SS12B (kids) share the exact same 20 colours and codes —
+  // one shared swatch list, with the image and style code swapping between
+  // the two styles depending on which size is selected.
   const colours = [
-    { name: "Jet Black", hex: "#000000" },
-    { name: "White", hex: "#ffffff" },
-    { name: "Navy (Oxford)", hex: "#041848" },
-    { name: "Sapphire Blue", hex: "#0380ff" },
-    { name: "Royal Blue", hex: "#003cf0" },
-    { name: "Purple", hex: "#2402e0" },
-    { name: "Fire Red", hex: "#da0043" },
-    { name: "Burnt Orange", hex: "#fa2d0f" },
-    { name: "Heather Grey", hex: "#a2a9a8" },
-    { name: "Burgundy", hex: "#45002e" },
-    { name: "Kelly Green", hex: "#0b9900" },
-    { name: "Bottle Green", hex: "#105017" },
-    { name: "Sun Yellow", hex: "#ffe800" },
-    { name: "Gold", hex: "#ffb821" }
+    { name: "Black", code: "BLK" },
+    { name: "White", code: "WHI" },
+    { name: "Sky Blue", code: "SKY" },
+    { name: "Azure", code: "AZR" },
+    { name: "Deep Navy", code: "DNA" },
+    { name: "Navy", code: "NAV" },
+    { name: "Royal Blue", code: "ROY" },
+    { name: "Purple", code: "PUR" },
+    { name: "Bottle Green", code: "BOT" },
+    { name: "Kelly Green", code: "KEL" },
+    { name: "Lime Green", code: "LIM" },
+    { name: "Classic Olive", code: "COL" },
+    { name: "Light Graphite", code: "LGP" },
+    { name: "Heather Grey", code: "HEA" },
+    { name: "Red", code: "RED" },
+    { name: "Burgundy", code: "BUR" },
+    { name: "Fuchsia", code: "FUS" },
+    { name: "Orange", code: "ORA" },
+    { name: "Sunflower", code: "SUN" },
+    { name: "Yellow", code: "YEL" }
   ];
 
+  const KIDS_SIZES = ["3-4", "5-6", "7-8", "9-11", "12-13", "14-15"];
+
+  function buildImgUrl(style, code) {
+    return `https://www.fullcollection.com/storage/phoenix/2026/Phoenix%20All%20Images/Fruit%20of%20the%20Loom/Product%20Images/${style}/ProductCarouselMain/${style}%20${code}%20FRONT.jpg`;
+  }
+
   const swatchContainer = document.getElementById("swatches");
+  const photo = document.getElementById("product-photo");
+  const styleCodeEl = document.getElementById("style-code");
   const colourNameEl = document.getElementById("colour-name");
+  const priceEl = document.querySelector(".product-details .price");
+  const sizingGuideBtn = document.getElementById("sizing-guide-btn");
+  const sizeSelect = document.getElementById("size-select");
   const qtyInput = document.getElementById("qty-input");
 
+  let currentColourCode = colours[0].code;
+  let colourChosen = false;
+
+  function currentStyle() {
+    return KIDS_SIZES.includes(sizeSelect.value) ? "SS12B" : "SS12";
+  }
+
+  function updatePrice() {
+    const price = KIDS_SIZES.includes(sizeSelect.value) ? 10 : 12;
+    priceEl.textContent = `£${price.toFixed(2)} per t-shirt`;
+  }
+
+  function updateStyleCode() {
+    const style = currentStyle();
+    styleCodeEl.textContent = style;
+    updatePrice();
+    sizingGuideBtn.href = `../assets/sizing-guides/${style.toLowerCase()}.pdf`;
+    if (colourChosen) photo.src = buildImgUrl(style, currentColourCode);
+  }
+
   function selectColour(c, btn) {
+    currentColourCode = c.code;
+    colourChosen = true;
+    photo.src = buildImgUrl(currentStyle(), c.code);
     colourNameEl.textContent = c.name;
     document.querySelectorAll(".swatch").forEach(s => s.classList.remove("selected"));
     btn.classList.add("selected");
@@ -200,12 +246,15 @@
   colours.forEach((c, i) => {
     const btn = document.createElement("button");
     btn.className = "swatch" + (i === 0 ? " selected" : "");
-    btn.style.background = c.hex;
+    btn.style.backgroundImage = `url(${buildImgUrl("SS12", c.code)})`;
     btn.title = c.name;
     btn.type = "button";
     btn.addEventListener("click", () => selectColour(c, btn));
     swatchContainer.appendChild(btn);
   });
+
+  sizeSelect.addEventListener("change", updateStyleCode);
+  updateStyleCode();
 
   qtyInput.addEventListener("change", () => {
     qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) || 1);

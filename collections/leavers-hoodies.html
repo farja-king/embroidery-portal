@@ -35,11 +35,14 @@
 
   <div class="product-details">
     <h1>Leavers Hoodie</h1>
-    <div class="code">JH001 &mdash; <span id="colour-name">Jet Black</span></div>
+    <div style="color:#6b6459; font-size:0.9rem; margin-bottom:0.25rem;">280 gsm</div>
+    <div class="code">JH001 &mdash; <span id="colour-name">Black</span></div>
     <div class="price">From £20.00 per hoodie</div>
     <p style="color:#6b6459; font-size:0.9rem;">Includes a full back leavers design. Optional left chest embroidered school logo +£3. This is a guide price for a quote &mdash; we'll confirm your final total based on quantity and options.</p>
 
     <div class="sizing-guide-link"><a href="../assets/sizing-guides/jh001.pdf" target="_blank" rel="noopener">📐 Download Sizing Guide</a></div>
+
+    <p style="font-size:0.8rem; color:#6b6459; margin-bottom:0.5rem;">Colours are matched as closely as possible to our Leavers T-Shirt range, but exact shades may vary slightly between products.</p>
 
     <div class="colour-swatches" id="swatches"></div>
 
@@ -61,11 +64,8 @@
           <option>XL</option>
           <option>2XL</option>
           <option>3XL</option>
-          <option>4XL</option>
-          <option>5XL</option>
         </optgroup>
       </select>
-      <span class="field-hint">4XL and 5XL are only available in a limited range of colours &mdash; we'll confirm availability for your chosen colour.</span>
     </div>
 
     <div class="form-field">
@@ -174,26 +174,32 @@
 <script src="../assets/main.js"></script>
 <script>
   const IMG_BASE = "https://www.fullcollection.com/storage/phoenix/2026/Phoenix%20All%20Images/Just%20Hoods/Product%20Images/JH001/ProductCarouselMain/";
-  // availableIn4XL5XL reflects the manufacturer's sizing chart footnote —
-  // only this subset of colours is offered in 4XL/5XL.
+  // Unified with the Leavers T-Shirt's 20 colours (SS12/SS12B) so customers
+  // see the same colour names on both products. Each entry's display name
+  // matches the T-shirt's colour name; the image/code is whichever JH001
+  // hoodie colourway is the closest available match to that shade.
   const colours = [
-    { name: "Jet Black", img: IMG_BASE + "JH001%20JBK%20FRONT.jpg", availableIn4XL5XL: true },
-    { name: "White", img: IMG_BASE + "JH001%20ACW%20FRONT.jpg", availableIn4XL5XL: true },
-    { name: "Navy (Oxford)", img: IMG_BASE + "JH001%20OXN%20FRONT.jpg", availableIn4XL5XL: true },
-    { name: "Sapphire Blue", img: IMG_BASE + "JH001%20SAP%20FRONT.jpg", availableIn4XL5XL: true },
-    { name: "Royal Blue", img: IMG_BASE + "JH001%20ROY%20FRONT.jpg", availableIn4XL5XL: true },
-    { name: "Purple", img: IMG_BASE + "JH001%20PUR%20FRONT.jpg", availableIn4XL5XL: true },
-    { name: "Fire Red", img: IMG_BASE + "JH001%20FIR%20FRONT.jpg", availableIn4XL5XL: true },
-    { name: "Burnt Orange", img: IMG_BASE + "JH001%20BOR%20FRONT.jpg", availableIn4XL5XL: false },
-    { name: "Heather Grey", img: IMG_BASE + "JH001%20HEA%20FRONT.jpg", availableIn4XL5XL: true },
-    { name: "Burgundy", img: IMG_BASE + "JH001%20BUR%20FRONT.jpg", availableIn4XL5XL: true },
-    { name: "Kelly Green", img: IMG_BASE + "JH001%20KEL%20FRONT.jpg", availableIn4XL5XL: false },
-    { name: "Bottle Green", img: IMG_BASE + "JH001%20BOT%20FRONT.jpg", availableIn4XL5XL: true },
-    { name: "Sun Yellow", img: IMG_BASE + "JH001%20SNY%20FRONT.jpg", availableIn4XL5XL: false },
-    { name: "Gold", img: IMG_BASE + "JH001%20GOL%20FRONT.jpg", availableIn4XL5XL: false }
+    { name: "Black", img: IMG_BASE + "JH001%20CHA%20FRONT.jpg" },
+    { name: "White", img: IMG_BASE + "JH001%20ACW%20FRONT.jpg" },
+    { name: "Sky Blue", img: IMG_BASE + "JH001%20SKY%20FRONT.jpg" },
+    { name: "Azure", img: IMG_BASE + "JH001%20HWB%20FRONT.jpg" },
+    { name: "Deep Navy", img: IMG_BASE + "JH001%20NYS%20FRONT.jpg" },
+    { name: "Navy", img: IMG_BASE + "JH001%20IKB%20FRONT.jpg" },
+    { name: "Royal Blue", img: IMG_BASE + "JH001%20ROY%20FRONT.jpg" },
+    { name: "Purple", img: IMG_BASE + "JH001%20PUR%20FRONT.jpg" },
+    { name: "Bottle Green", img: IMG_BASE + "JH001%20BOT%20FRONT.jpg" },
+    { name: "Kelly Green", img: IMG_BASE + "JH001%20SPG%20FRONT.jpg" },
+    { name: "Lime Green", img: IMG_BASE + "JH001%20LIM%20FRONT.jpg" },
+    { name: "Classic Olive", img: IMG_BASE + "JH001%20ERG%20FRONT.jpg" },
+    { name: "Light Graphite", img: IMG_BASE + "JH001%20SHK%20FRONT.jpg" },
+    { name: "Heather Grey", img: IMG_BASE + "JH001%20MOG%20FRONT.jpg" },
+    { name: "Red", img: IMG_BASE + "JH001%20FIR%20FRONT.jpg" },
+    { name: "Burgundy", img: IMG_BASE + "JH001%20BGS%20FRONT.jpg" },
+    { name: "Orange", img: IMG_BASE + "JH001%20BOR%20FRONT.jpg" },
+    { name: "Sunflower", img: IMG_BASE + "JH001%20GOL%20FRONT.jpg" },
+    { name: "Fuchsia", img: IMG_BASE + "JH001%20HPK%20FRONT.jpg" },
+    { name: "Yellow", img: IMG_BASE + "JH001%20SNY%20FRONT.jpg" }
   ];
-
-  const BIG_SIZES = ["4XL", "5XL"];
 
   const swatchContainer = document.getElementById("swatches");
   const photo = document.getElementById("product-photo");
@@ -217,7 +223,7 @@
     btn.classList.add("selected");
   }
 
-  const swatchButtons = colours.map((c, i) => {
+  colours.forEach((c, i) => {
     const btn = document.createElement("button");
     btn.className = "swatch" + (i === 0 ? " selected" : "");
     btn.style.backgroundImage = `url(${c.img})`;
@@ -225,35 +231,10 @@
     btn.type = "button";
     btn.addEventListener("click", () => selectColour(c, btn));
     swatchContainer.appendChild(btn);
-    return btn;
   });
 
-  // Only show swatches actually available for the selected size (4XL/5XL
-  // are limited to a subset of colours per the manufacturer's chart). If
-  // the currently selected colour isn't available at the new size, switch
-  // to the first colour that is.
-  function updateSwatchAvailability() {
-    const isBigSize = BIG_SIZES.includes(sizeSelect.value);
-    let selectedStillAvailable = false;
-
-    swatchButtons.forEach((btn, i) => {
-      const available = !isBigSize || colours[i].availableIn4XL5XL;
-      btn.style.display = available ? "" : "none";
-      if (available && btn.classList.contains("selected")) selectedStillAvailable = true;
-    });
-
-    if (!selectedStillAvailable) {
-      const fallbackIndex = colours.findIndex((c, i) => !isBigSize || c.availableIn4XL5XL);
-      if (fallbackIndex >= 0) selectColour(colours[fallbackIndex], swatchButtons[fallbackIndex]);
-    }
-  }
-
-  sizeSelect.addEventListener("change", () => {
-    updatePrice();
-    updateSwatchAvailability();
-  });
+  sizeSelect.addEventListener("change", updatePrice);
   updatePrice();
-  updateSwatchAvailability();
 
   qtyInput.addEventListener("change", () => {
     qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) || 1);

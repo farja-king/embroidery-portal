@@ -446,8 +446,9 @@ footer.site-footer {
   resize: vertical;
 }
 
-.form-field .field-hint {
+.field-hint {
   display: block;
+  width: 100%;
   font-size: 0.8rem;
   color: var(--muted);
   font-weight: 400;

@@ -300,6 +300,16 @@ function renderCartPage() {
   if (sendBtn) sendBtn.href = whatsappLink(buildCartMessage(cart));
 }
 
+// Called when the customer clicks "Send My Cart on WhatsApp". The link's
+// own href/target still open WhatsApp in a new tab as normal; this just
+// clears the cart and takes the current tab to a thank-you page afterwards.
+function handleSendCart() {
+  setTimeout(() => {
+    saveCart([]);
+    window.location.href = "thank-you.html";
+  }, 400);
+}
+
 function buildCartMessage(cart) {
   const lines = cart.map((item, i) => {
     const qty = item.qty || 1;
@@ -399,5 +409,27 @@ function initAnnouncementBar() {
   }, 5000);
 }
 
+// ---- "Back to last product" (cart page convenience) ----
+const LAST_PRODUCT_KEY = "embroideryClickLastProduct";
+
+// Called on every page load. If this page looks like a product page,
+// remember it so the cart page can offer a way back to it.
+function trackLastProductPage() {
+  if (document.querySelector(".product-details")) {
+    localStorage.setItem(LAST_PRODUCT_KEY, window.location.href);
+  }
+}
+
+function initContinueShoppingLink() {
+  const link = document.getElementById("continue-shopping-link");
+  if (!link) return;
+  const last = localStorage.getItem(LAST_PRODUCT_KEY);
+  if (last) {
+    link.href = last;
+    link.textContent = "← Back to Shopping";
+  }
+}
+
 updateCartBadge();
 initAnnouncementBar();
+trackLastProductPage();

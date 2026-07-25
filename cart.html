@@ -29,6 +29,8 @@
 <div class="breadcrumb"><a href="index.html">Home</a> / Your Cart</div>
 
 <div class="cart-page">
+  <a id="continue-shopping-link" href="index.html" style="display:inline-block; font-size:0.9rem; color:var(--accent-dark); text-decoration:none; margin-bottom:1rem;">&larr; Back to Shopping</a>
+
   <h2>Your Cart</h2>
   <p style="color:#6b6459; font-size:0.9rem;">Add items from any product page, then send the whole list to us on WhatsApp for a quote — we'll confirm final pricing, sizes and payment with you directly.</p>
 
@@ -49,7 +51,7 @@
       <span>Total</span>
       <span id="cart-total">£0.00</span>
     </div>
-    <a id="cart-whatsapp-btn" class="whatsapp-btn whatsapp-btn--large" href="#" target="_blank" rel="noopener">💬 Send My Cart on WhatsApp</a>
+    <a id="cart-whatsapp-btn" class="whatsapp-btn whatsapp-btn--large" href="#" target="_blank" rel="noopener" onclick="handleSendCart()">💬 Send My Cart on WhatsApp</a>
     <button class="clear-cart-btn" type="button" onclick="clearCart()">Empty Cart</button>
   </div>
 </div>
@@ -68,6 +70,7 @@
 <script src="assets/main.js"></script>
 <script>
   renderCartPage();
+  initContinueShoppingLink();
 </script>
 
 </body>

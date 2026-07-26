@@ -42,11 +42,12 @@
     <p class="min-order-note">Fill in the details below once — they'll apply to every Leavers Mug you add to your cart, so you only need to enter them a single time per order.</p>
 
     <div class="form-field">
-      <label for="print-colour">Print Colour</label>
-      <select id="print-colour">
-        <option value="">Select colour...</option>
-        <option>Black</option>
-      </select>
+      <label>Print Colour</label>
+      <div class="colour-swatches" id="print-colour-swatches"></div>
+      <div id="other-colour-wrap" style="display:none; margin-top:0.5rem;">
+        <input type="text" id="other-colour-input" placeholder="Please specify colour">
+      </div>
+      <input type="hidden" id="print-colour" value="">
     </div>
 
     <div class="form-field">
@@ -81,7 +82,7 @@
     <ul class="specs">
       <li>Includes leavers design</li>
       <li>Optional names on mug</li>
-      <li>Print colour: Black only</li>
+      <li>Print colour: Black, Red, Green, Blue, or Other (please specify)</li>
       <li>Signed proof required before production</li>
       <li>Turnaround: 14 days from proof approval</li>
       <li>Faults/incorrect items: report within 48 hours</li>
@@ -125,6 +126,66 @@
 
   qtyInput.addEventListener("change", () => {
     qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+  });
+
+  // Print colour swatches — little mug icons instead of a dropdown. The
+  // hidden #print-colour input holds the actual value so the shared
+  // captureLeaversFieldsFromPage() logic in main.js keeps working unchanged.
+  const PRINT_COLOURS = [
+    { name: "Black", hex: "#111111" },
+    { name: "Red", hex: "#d0021b" },
+    { name: "Green", hex: "#1a9850" },
+    { name: "Blue", hex: "#1a56d6" }
+  ];
+
+  function mugIconUrl(hex) {
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>` +
+      `<path d='M14 12h28v30a10 10 0 0 1-10 10H24a10 10 0 0 1-10-10V12z' fill='${hex}'/>` +
+      `<path d='M42 20h5a8 8 0 0 1 0 16h-5' fill='none' stroke='${hex}' stroke-width='6'/>` +
+      `</svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }
+
+  const printColourInput = document.getElementById("print-colour");
+  const printSwatchContainer = document.getElementById("print-colour-swatches");
+  const otherWrap = document.getElementById("other-colour-wrap");
+  const otherInput = document.getElementById("other-colour-input");
+
+  function clearPrintSwatchSelection() {
+    printSwatchContainer.querySelectorAll(".swatch").forEach(s => s.classList.remove("selected"));
+  }
+
+  PRINT_COLOURS.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "swatch";
+    btn.style.backgroundImage = `url(${mugIconUrl(c.hex)})`;
+    btn.title = c.name;
+    btn.type = "button";
+    btn.addEventListener("click", () => {
+      clearPrintSwatchSelection();
+      btn.classList.add("selected");
+      otherWrap.style.display = "none";
+      printColourInput.value = c.name;
+    });
+    printSwatchContainer.appendChild(btn);
+  });
+
+  const otherBtn = document.createElement("button");
+  otherBtn.className = "swatch";
+  otherBtn.style.backgroundImage = `url(${mugIconUrl("#9a958c")})`;
+  otherBtn.title = "Other";
+  otherBtn.type = "button";
+  otherBtn.addEventListener("click", () => {
+    clearPrintSwatchSelection();
+    otherBtn.classList.add("selected");
+    otherWrap.style.display = "block";
+    printColourInput.value = otherInput.value.trim() ? `Other: ${otherInput.value.trim()}` : "Other";
+    otherInput.focus();
+  });
+  printSwatchContainer.appendChild(otherBtn);
+
+  otherInput.addEventListener("input", () => {
+    printColourInput.value = otherInput.value.trim() ? `Other: ${otherInput.value.trim()}` : "Other";
   });
 
   initUploadWidget("upload-btn", "upload-status", "customer-designs/leavers-mugs", (url) => {

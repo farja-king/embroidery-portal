@@ -68,6 +68,17 @@
       </select>
     </div>
 
+    <div class="form-field">
+      <label for="qty-input">Quantity</label>
+      <input type="number" id="qty-input" min="1" value="1">
+      <span class="field-hint">Enter any quantity per colour/size &mdash; the 10-unit minimum applies to your whole order, not each line.</span>
+    </div>
+
+    <p style="font-size:0.85rem; color:#6b6459; margin-bottom:0.75rem;">Add each size/colour combination you need separately — they'll be itemized in your cart since kids and adult sizes are priced differently.</p>
+
+    <button class="add-to-cart-btn" type="button" onclick="addLeaversItemToCart('cart-status')">&#128722; Add to Cart</button>
+    <div class="upload-status" id="cart-status"></div>
+
     <p class="min-order-note">Fill in the details below once — they'll apply to every Leavers T-Shirt size/colour you add to your cart, so you only need to enter them a single time per order.</p>
 
     <div class="form-field">
@@ -118,12 +129,6 @@
       <textarea id="order-notes" placeholder="Any requests we should know about, including a colour request if it's not in the list above"></textarea>
     </div>
 
-    <div class="form-field">
-      <label for="qty-input">Quantity</label>
-      <input type="number" id="qty-input" min="1" value="1">
-      <span class="field-hint">Enter any quantity per colour/size &mdash; the 10-unit minimum applies to your whole order, not each line.</span>
-    </div>
-
     <div class="min-order-note">This is a bulk quote request — minimum order 10 units across your whole order (you can mix sizes and colours to reach it). We'll confirm final pricing, proof and payment with you directly.</div>
 
     <ul class="specs">
@@ -150,11 +155,6 @@
       <button id="docs-upload-btn" type="button">Upload supporting docs</button>
       <div class="upload-status" id="docs-upload-status"></div>
     </div>
-
-    <p style="font-size:0.85rem; color:#6b6459; margin-bottom:0.75rem;">Add each size/colour combination you need separately — they'll be itemized in your cart.</p>
-
-    <button class="add-to-cart-btn" type="button" onclick="addLeaversItemToCart('cart-status')">&#128722; Add to Cart</button>
-    <div class="upload-status" id="cart-status"></div>
 
     <a class="whatsapp-btn whatsapp-btn--large" href="../cart.html">View Cart &amp; Send Quote</a>
   </div>

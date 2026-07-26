@@ -158,7 +158,7 @@
   PRINT_COLOURS.forEach(c => {
     const btn = document.createElement("button");
     btn.className = "swatch";
-    btn.style.backgroundImage = `url(${mugIconUrl(c.hex)})`;
+    btn.style.backgroundImage = `url("${mugIconUrl(c.hex)}")`;
     btn.title = c.name;
     btn.type = "button";
     btn.addEventListener("click", () => {
@@ -172,7 +172,7 @@
 
   const otherBtn = document.createElement("button");
   otherBtn.className = "swatch";
-  otherBtn.style.backgroundImage = `url(${mugIconUrl("#9a958c")})`;
+  otherBtn.style.backgroundImage = `url("${mugIconUrl("#9a958c")}")`;
   otherBtn.title = "Other";
   otherBtn.type = "button";
   otherBtn.addEventListener("click", () => {

@@ -212,14 +212,14 @@ function removeFromCart(index) {
   const cart = getCart();
   cart.splice(index, 1);
   saveCart(cart);
-  renderCartPage();
+  renderCartUI();
 }
 
 function clearCart() {
   if (getCart().length === 0) return;
   if (!confirm("Remove all items from your cart?")) return;
   saveCart([]);
-  renderCartPage();
+  renderCartUI();
 }
 
 function updateCartItemQty(index, delta) {
@@ -227,24 +227,26 @@ function updateCartItemQty(index, delta) {
   if (!cart[index]) return;
   cart[index].qty = Math.max(1, (cart[index].qty || 1) + delta);
   saveCart(cart);
-  renderCartPage();
+  renderCartUI();
 }
 
 function cartTotal(cart) {
   return cart.reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
 }
 
-// Renders the cart page's item list + running total. Only does anything
-// if the expected cart-page elements are present.
-function renderCartPage() {
-  const list = document.getElementById("cart-list");
+// Renders a cart item list + running total into a given set of element
+// ids. Used for both the full cart page and the slide-out cart drawer,
+// which show the same data in two different containers. Only does
+// anything if the list container is present.
+function renderCartInto(ids) {
+  const list = document.getElementById(ids.list);
   if (!list) return;
 
   const cart = getCart();
-  const emptyMsg = document.getElementById("cart-empty");
-  const summary = document.getElementById("cart-summary");
-  const leaversBox = document.getElementById("leavers-details-box");
-  const leaversContent = document.getElementById("leavers-details-content");
+  const emptyMsg = document.getElementById(ids.empty);
+  const summary = document.getElementById(ids.summary);
+  const leaversBox = document.getElementById(ids.leaversBox);
+  const leaversContent = document.getElementById(ids.leaversContent);
   const leaversLines = getLeaversDetailsLines();
 
   if (leaversBox && leaversContent) {
@@ -293,11 +295,42 @@ function renderCartPage() {
   `;
   }).join("");
 
-  const totalEl = document.getElementById("cart-total");
+  const totalEl = document.getElementById(ids.total);
   if (totalEl) totalEl.textContent = `£${cartTotal(cart).toFixed(2)}`;
 
-  const sendBtn = document.getElementById("cart-whatsapp-btn");
+  const sendBtn = document.getElementById(ids.whatsappBtn);
   if (sendBtn) sendBtn.href = whatsappLink(buildCartMessage(cart));
+}
+
+function renderCartPage() {
+  renderCartInto({
+    list: "cart-list", empty: "cart-empty", summary: "cart-summary",
+    total: "cart-total", whatsappBtn: "cart-whatsapp-btn",
+    leaversBox: "leavers-details-box", leaversContent: "leavers-details-content"
+  });
+}
+
+function renderCartDrawer() {
+  renderCartInto({
+    list: "drawer-cart-list", empty: "drawer-cart-empty", summary: "drawer-cart-summary",
+    total: "drawer-cart-total", whatsappBtn: "drawer-cart-whatsapp-btn",
+    leaversBox: "drawer-leavers-details-box", leaversContent: "drawer-leavers-details-content"
+  });
+}
+
+// Keeps the full cart page and the slide-out drawer in sync — whichever
+// of the two is actually present on the current page re-renders, the
+// other call is just a no-op.
+function renderCartUI() {
+  renderCartPage();
+  renderCartDrawer();
+}
+
+// Collections pages live one folder down (/collections/...), everything
+// else is at the site root — this resolves a root-relative path from
+// either location.
+function rootPath(path) {
+  return window.location.pathname.includes("/collections/") ? `../${path}` : path;
 }
 
 // Called when the customer clicks "Send My Cart on WhatsApp". The link's
@@ -306,7 +339,7 @@ function renderCartPage() {
 function handleSendCart() {
   setTimeout(() => {
     saveCart([]);
-    window.location.href = "thank-you.html";
+    window.location.href = rootPath("thank-you.html");
   }, 400);
 }
 
@@ -355,12 +388,12 @@ function getLeaversDetails() {
 function saveLeaversDetails(partial) {
   const current = getLeaversDetails();
   localStorage.setItem(LEAVERS_KEY, JSON.stringify(Object.assign({}, current, partial)));
-  renderCartPage();
+  renderCartUI();
 }
 
 function clearLeaversDetails() {
   localStorage.removeItem(LEAVERS_KEY);
-  renderCartPage();
+  renderCartUI();
 }
 
 function getLeaversDetailsLines() {
@@ -430,6 +463,82 @@ function initContinueShoppingLink() {
   }
 }
 
+// ---- Slide-out cart drawer ----
+// Builds a right-hand slide-out mini cart (same data as the full cart
+// page, rendered via renderCartDrawer) and wires the header's cart icon
+// to open it instead of navigating straight to cart.html. The drawer
+// itself has a "View Full Cart Page" link for anyone who wants the full
+// page instead.
+function openCartDrawer() {
+  document.getElementById("cart-drawer").classList.add("open");
+  document.getElementById("cart-drawer-overlay").classList.add("open");
+  document.body.classList.add("cart-drawer-locked");
+}
+
+function closeCartDrawer() {
+  document.getElementById("cart-drawer").classList.remove("open");
+  document.getElementById("cart-drawer-overlay").classList.remove("open");
+  document.body.classList.remove("cart-drawer-locked");
+}
+
+function initCartDrawer() {
+  const cartIcon = document.querySelector(".cart-icon");
+  if (!cartIcon || document.getElementById("cart-drawer")) return;
+
+  const overlay = document.createElement("div");
+  overlay.className = "cart-drawer-overlay";
+  overlay.id = "cart-drawer-overlay";
+
+  const drawer = document.createElement("aside");
+  drawer.className = "cart-drawer";
+  drawer.id = "cart-drawer";
+  drawer.innerHTML = `
+    <div class="cart-drawer-header">
+      <h3>Your Cart</h3>
+      <button type="button" class="cart-drawer-close" id="cart-drawer-close" aria-label="Close cart">&times;</button>
+    </div>
+    <div class="cart-drawer-body">
+      <div id="drawer-cart-empty" class="cart-empty" style="display:none;">
+        Your cart is empty. Browse the range and click <strong>Add to Cart</strong> on anything you like.
+      </div>
+      <div id="drawer-cart-list"></div>
+      <div id="drawer-leavers-details-box" class="min-order-note" style="display:none;">
+        <strong>Leavers Order Details</strong> (applies to every Leavers item above)
+        <div id="drawer-leavers-details-content" style="font-weight:400; margin-top:0.5rem;"></div>
+        <button type="button" class="clear-cart-btn" onclick="clearLeaversDetails()">Clear these details</button>
+      </div>
+      <div id="drawer-cart-summary" class="cart-summary" style="display:none;">
+        <div class="cart-summary-row">
+          <span>Total</span>
+          <span id="drawer-cart-total">£0.00</span>
+        </div>
+        <a id="drawer-cart-whatsapp-btn" class="whatsapp-btn whatsapp-btn--large" href="#" target="_blank" rel="noopener" onclick="handleSendCart()" style="width:100%; justify-content:center;">💬 Send My Cart on WhatsApp</a>
+        <button class="clear-cart-btn" type="button" onclick="clearCart()">Empty Cart</button>
+      </div>
+    </div>
+    <div class="cart-drawer-footer">
+      <a class="add-to-cart-btn" id="view-cart-page-link" href="${rootPath("cart.html")}" style="width:100%; justify-content:center;">View Full Cart Page</a>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(drawer);
+
+  cartIcon.addEventListener("click", (e) => {
+    e.preventDefault();
+    renderCartDrawer();
+    openCartDrawer();
+  });
+
+  document.getElementById("cart-drawer-close").addEventListener("click", closeCartDrawer);
+  overlay.addEventListener("click", closeCartDrawer);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeCartDrawer();
+  });
+}
+
 updateCartBadge();
 initAnnouncementBar();
 trackLastProductPage();
+initCartDrawer();
+renderCartUI();

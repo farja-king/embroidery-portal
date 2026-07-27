@@ -161,14 +161,14 @@ nav.main-nav > a:hover { color: var(--whatsapp); }
     url("hero-images/embroidery-machine-hero.jpg") center/cover no-repeat;
   text-align: center;
   padding: 3rem 1.5rem;
-  min-height: 620px;
+  min-height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 @media (max-width: 700px) {
-  .hero { min-height: 420px; }
+  .hero { min-height: 320px; }
 }
 
 .hero-inner {

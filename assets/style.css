@@ -206,6 +206,56 @@ nav.main-nav > a:hover { color: var(--whatsapp); }
 
 .whatsapp-btn:hover { background: #1ebe5a; }
 
+.portfolio-strip {
+  padding: 2.5rem 1.5rem 0.5rem;
+  text-align: center;
+}
+
+.portfolio-strip h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.portfolio-track-wrap {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+
+.portfolio-track {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  animation: portfolio-scroll 50s linear infinite;
+}
+
+.portfolio-track-wrap:hover .portfolio-track {
+  animation-play-state: paused;
+}
+
+.portfolio-track img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+@keyframes portfolio-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-track { animation: none; }
+  .portfolio-track-wrap { overflow-x: auto; }
+}
+
+@media (max-width: 600px) {
+  .portfolio-track img { width: 110px; height: 110px; }
+}
+
 .whatsapp-btn--large {
   padding: 1.1rem 2rem;
   font-size: 1.15rem;

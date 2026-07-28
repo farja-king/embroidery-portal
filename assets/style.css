@@ -306,14 +306,15 @@ p { margin: 0 0 1rem; }
 /* --- Announcement bar ---------------------------------------------------- */
 
 .announcement-bar {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--paper);
+  color: var(--ink);
   text-align: center;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--rule);
   transition: opacity var(--slow) var(--ease);
 }
 

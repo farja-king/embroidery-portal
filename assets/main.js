@@ -256,8 +256,8 @@ function renderCartInto(ids) {
 
     if (leaversQty > 0 && cart.length) {
       const qtyLine = leaversQty >= 10
-        ? `<strong style="color: var(--whatsapp);">&#10003; Total Leavers units: ${leaversQty} (10 minimum met)</strong>`
-        : `<strong style="color: #d90000;">&#9888; Total Leavers units: ${leaversQty} &mdash; add ${10 - leaversQty} more to reach the 10-unit minimum</strong>`;
+        ? `<strong style="color: var(--whatsapp-dark);">Total Leavers units: ${leaversQty} — 10-unit minimum met</strong>`
+        : `<strong style="color: var(--danger);">Total Leavers units: ${leaversQty} — add ${10 - leaversQty} more to reach the 10-unit minimum</strong>`;
       leaversContent.innerHTML = [qtyLine].concat(leaversLines.map(l => l.replace(/</g, "&lt;"))).join("<br>");
       leaversBox.style.display = "block";
     } else {
@@ -428,8 +428,9 @@ function initAnnouncementBar() {
   const el = document.getElementById("announcement-bar");
   if (!el) return;
   const messages = [
-    "Crystal Custom Embroidery",
-    "Based in Raunds — The Home of Embroidery Products"
+    "Embroidery, printing & digitising — made in Raunds, Northamptonshire",
+    "Rated 5.0 on Google · Every order proofed before production",
+    "All work carried out in-store by our resident expert"
   ];
   let i = 0;
   setInterval(() => {
@@ -512,7 +513,7 @@ function initCartDrawer() {
           <span>Total</span>
           <span id="drawer-cart-total">£0.00</span>
         </div>
-        <a id="drawer-cart-whatsapp-btn" class="whatsapp-btn whatsapp-btn--large" href="#" target="_blank" rel="noopener" onclick="handleSendCart()" style="width:100%; justify-content:center;">💬 Send My Cart on WhatsApp</a>
+        <a id="drawer-cart-whatsapp-btn" class="whatsapp-btn whatsapp-btn--large" href="#" target="_blank" rel="noopener" onclick="handleSendCart()" style="width:100%; justify-content:center;">Send My Cart on WhatsApp</a>
         <button class="clear-cart-btn" type="button" onclick="clearCart()">Empty Cart</button>
       </div>
     </div>
@@ -537,8 +538,121 @@ function initCartDrawer() {
   });
 }
 
+// ---- Category carousel ----
+// Drives the "our work on this garment" carousel at the top of each
+// collection page. Autoplays, but stops for good the moment the customer
+// takes control (click, key, swipe) so it never fights them.
+function initCategoryCarousel(root) {
+  const carousel = root || document.querySelector("[data-carousel]");
+  if (!carousel) return;
+
+  const slides = Array.from(carousel.querySelectorAll(".carousel-slide"));
+  if (slides.length < 2) return;
+
+  const dotsWrap = carousel.querySelector(".carousel-dots");
+  const prevBtn = carousel.querySelector(".carousel-btn--prev");
+  const nextBtn = carousel.querySelector(".carousel-btn--next");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let index = 0;
+  let timer = null;
+  let stopped = false;
+
+  const dots = slides.map((_, i) => {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.className = "carousel-dot" + (i === 0 ? " is-active" : "");
+    dot.setAttribute("aria-label", `Show image ${i + 1} of ${slides.length}`);
+    dot.addEventListener("click", () => { stop(); go(i); });
+    if (dotsWrap) dotsWrap.appendChild(dot);
+    return dot;
+  });
+
+  function go(next) {
+    index = (next + slides.length) % slides.length;
+    slides.forEach((s, i) => {
+      const active = i === index;
+      s.classList.toggle("is-active", active);
+      s.setAttribute("aria-hidden", active ? "false" : "true");
+    });
+    dots.forEach((d, i) => d.classList.toggle("is-active", i === index));
+  }
+
+  function start() {
+    if (reduced || stopped || timer) return;
+    timer = setInterval(() => go(index + 1), 5000);
+  }
+
+  function stop() {
+    stopped = true;
+    clearInterval(timer);
+    timer = null;
+  }
+
+  if (prevBtn) prevBtn.addEventListener("click", () => { stop(); go(index - 1); });
+  if (nextBtn) nextBtn.addEventListener("click", () => { stop(); go(index + 1); });
+
+  carousel.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") { stop(); go(index - 1); }
+    if (e.key === "ArrowRight") { stop(); go(index + 1); }
+  });
+
+  // Pause while the pointer is over it, resume on the way out — but only
+  // if the customer hasn't already taken manual control.
+  carousel.addEventListener("mouseenter", () => { clearInterval(timer); timer = null; });
+  carousel.addEventListener("mouseleave", start);
+
+  let touchX = null;
+  carousel.addEventListener("touchstart", (e) => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+  carousel.addEventListener("touchend", (e) => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 45) { stop(); go(index + (dx < 0 ? 1 : -1)); }
+    touchX = null;
+  }, { passive: true });
+
+  go(0);
+  start();
+}
+
+// ---- Scroll reveal ----
+// Fades sections in as they enter the viewport. Anything already on screen
+// at load shows immediately, so the first paint is never blank.
+function initScrollReveal() {
+  const targets = document.querySelectorAll(".reveal");
+  if (!targets.length) return;
+
+  if (!("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    targets.forEach(el => el.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.06 });
+
+  targets.forEach(el => observer.observe(el));
+}
+
+// Adds a shadow under the sticky header once the page has scrolled.
+function initStickyHeader() {
+  const header = document.querySelector(".site-header");
+  if (!header) return;
+  const onScroll = () => header.classList.toggle("is-stuck", window.scrollY > 8);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+}
+
 updateCartBadge();
 initAnnouncementBar();
 trackLastProductPage();
 initCartDrawer();
 renderCartUI();
+initCategoryCarousel();
+initScrollReveal();
+initStickyHeader();

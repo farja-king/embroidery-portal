@@ -491,8 +491,8 @@ nav.main-nav > a[aria-current="page"]::after { width: 100%; }
   color: var(--paper);
   display: flex;
   align-items: center;
-  min-height: clamp(460px, 68vh, 660px);
-  padding-block: clamp(3rem, 8vw, 6rem);
+  min-height: clamp(400px, 58vh, 560px);
+  padding-block: clamp(2.25rem, 6vw, 4.5rem);
 }
 
 .hero-inner {
@@ -500,9 +500,17 @@ nav.main-nav > a[aria-current="page"]::after { width: 100%; }
   margin: 0 auto;
   padding-inline: var(--gutter);
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(2rem, 5vw, 4rem);
 }
 
 .hero-copy { max-width: 41rem; }
+
+@media (max-width: 900px) {
+  .hero-inner { flex-direction: column; align-items: flex-start; }
+}
 
 .hero .eyebrow { color: #d9b06e; }
 
@@ -523,23 +531,24 @@ nav.main-nav > a[aria-current="page"]::after { width: 100%; }
   display: flex;
   flex-wrap: wrap;
   gap: 0.85rem;
-  margin-bottom: 2.5rem;
 }
 
-/* Trust row sitting under the hero CTAs. */
+/* Trust column sitting to the right of the hero copy. */
 .hero-trust {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: clamp(1.25rem, 3vw, 2.5rem);
-  padding-top: 1.75rem;
-  border-top: 1px solid rgba(250, 247, 241, 0.18);
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+  gap: clamp(1.1rem, 2.2vw, 1.6rem);
+  padding-left: clamp(1.5rem, 3vw, 2.5rem);
+  border-left: 1px solid rgba(250, 247, 241, 0.18);
 }
 
 .hero-trust div {
   font-size: 0.85rem;
   color: #b9c2cd;
   line-height: 1.4;
+  text-align: left;
 }
 
 .hero-trust strong {
@@ -549,6 +558,21 @@ nav.main-nav > a[aria-current="page"]::after { width: 100%; }
   font-weight: 600;
   color: #fff;
   letter-spacing: -0.02em;
+}
+
+@media (max-width: 900px) {
+  /* Stacked under the copy again — back to a horizontal divider. */
+  .hero-trust {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    padding-left: 0;
+    padding-top: 1.75rem;
+    margin-top: 2rem;
+    border-left: none;
+    border-top: 1px solid rgba(250, 247, 241, 0.18);
+  }
 }
 
 @media (max-width: 560px) {

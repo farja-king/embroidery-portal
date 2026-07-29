@@ -175,7 +175,7 @@ function addCurrentSelectionToCart(statusElId) {
   const qtyInput = document.getElementById("qty-input");
 
   const title = h1 ? h1.textContent.trim() : "Item";
-  const styleCode = codeEl ? codeEl.textContent.split("—")[0].trim() : "";
+  const styleCode = codeEl ? codeEl.textContent.split("-")[0].trim() : "";
   const colourName = colourNameEl ? colourNameEl.textContent.trim() : "";
   const size = sizeSelect ? sizeSelect.value : "One Size";
   const priceText = priceEl ? priceEl.textContent.trim() : "£0.00";

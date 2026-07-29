@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -8,7 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>AWDis Heavyweight Boxy 240 T-Shirt AT003 – Crystal Custom Embroidery of Raunds</title>
 <link rel="stylesheet" href="../assets/style.css?v=5">
-<script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 <script type="application/ld+json">
 {
     "@context":  "https://schema.org/",
@@ -185,7 +184,7 @@
   </div>
 </footer>
 
-<script src="../assets/main.js?v=6"></script>
+<script src="../assets/main.js?v=7"></script>
 <script>
   const colours = [
     { name: "Arctic White", code: "ACW" },
@@ -206,18 +205,22 @@
   const whatsappCta = document.getElementById("whatsapp-cta");
 
   let currentColour = "Arctic White";
-  let uploadedImageUrl = null;
+  let pendingDesign = null;
 
   function imgFor(c) {
     return IMG_BASE + "AT003%20" + c.code + "%20FRONT.jpg";
   }
 
-  function updateWhatsappLink() {
+  function buildMsg(imageUrl) {
     let msg = `Hi, I'd like to enquire about the AWDis Heavyweight Boxy 240 T-Shirt (AT003). Colour: ${currentColour}.`;
-    if (uploadedImageUrl) {
-      msg += ` Here's my design: ${uploadedImageUrl}`;
+    if (imageUrl) {
+      msg += ` Here's my design: ${imageUrl}`;
     }
-    whatsappCta.href = whatsappLink(msg);
+    return msg;
+  }
+
+  function updateWhatsappLink() {
+    whatsappCta.href = whatsappLink(buildMsg(null));
   }
 
   function selectColour(c, btn) {
@@ -240,10 +243,12 @@
   });
 
   updateWhatsappLink();
-  initUploadWidget("upload-btn", "upload-status", "customer-designs/at003", (url) => {
-    uploadedImageUrl = url;
+  initDeferredUpload("upload-btn", "upload-status", "customer-designs/at003", (info) => {
+    pendingDesign = info;
+    setPendingImageForCart(info);
     updateWhatsappLink();
   });
+  initWhatsappCta("whatsapp-cta", buildMsg, () => pendingDesign);
 </script>
 
 </body>

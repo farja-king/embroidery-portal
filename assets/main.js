@@ -3,104 +3,165 @@
 const CLOUDINARY_CLOUD_NAME = "dzifncuur";
 const CLOUDINARY_UPLOAD_PRESET = "ml_default";
 
-function initUploadWidget(buttonId, statusId, folder, onSuccess) {
-  const button = document.getElementById(buttonId);
-  const status = document.getElementById(statusId);
-  if (!button || typeof cloudinary === "undefined") return;
+// ---- Deferred uploads ----
+// Files the customer picks are kept locally (IndexedDB, so they survive
+// navigating between pages while shopping) and only actually uploaded to
+// Cloudinary once they confirm sending a quote — either "Add to Cart" +
+// "Send My Cart on WhatsApp", or the single-item "Find Out More on
+// WhatsApp" button. That way an abandoned upload never reaches Cloudinary
+// at all, and nothing leaves the browser until the customer has committed.
+const PENDING_DB_NAME = "embroideryClickPendingFiles";
 
-  const widget = cloudinary.createUploadWidget(
-    {
-      cloudName: CLOUDINARY_CLOUD_NAME,
-      uploadPreset: CLOUDINARY_UPLOAD_PRESET,
-      folder: folder,
-      multiple: false,
-      sources: ["local", "camera"],
-      maxFileSize: 15000000,
-      clientAllowedFormats: ["png", "jpg", "jpeg", "pdf"],
-    },
-    (error, result) => {
-      if (!error && result && result.event === "success") {
-        status.classList.remove("upload-status--error");
-        status.classList.add("upload-status--success");
-        status.textContent = "Uploaded — thanks! We've added a link to it in your WhatsApp message below.";
-        button.textContent = "Upload another image";
-        if (onSuccess) onSuccess(result.info.secure_url);
-        return;
-      }
-
-      if (!error && result && result.event === "queues-end") {
-        const failed = (result.info && result.info.files || []).find(f => f.status === "error" || f.uploadInfo === undefined && f.status !== "success");
-        if (failed) {
-          status.classList.remove("upload-status--success");
-          status.classList.add("upload-status--error");
-          status.textContent = "That file couldn't be uploaded — please use a JPG, PNG or PDF under 15MB, then click Upload your design to try again.";
-          widget.close();
-        }
-        return;
-      }
-
-      if (error) {
-        status.classList.remove("upload-status--success");
-        status.classList.add("upload-status--error");
-        status.textContent = "That file couldn't be uploaded — please use a JPG, PNG or PDF under 15MB, then click Upload your design to try again.";
-        widget.close();
-      }
-    }
-  );
-
-  button.addEventListener("click", () => widget.open());
+function openPendingDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(PENDING_DB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("files");
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
 }
 
-// Variant of initUploadWidget for non-image "supporting docs" (PDF, CSV,
-// Excel, Word) — needs resourceType "raw" since Cloudinary treats anything
-// that isn't an image/video as a raw file.
-function initDocsUploadWidget(buttonId, statusId, folder, onSuccess) {
+function savePendingFile(id, file) {
+  return openPendingDB().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction("files", "readwrite");
+    tx.objectStore("files").put(file, id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  }));
+}
+
+function getPendingFile(id) {
+  return openPendingDB().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction("files", "readonly");
+    const req = tx.objectStore("files").get(id);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  }));
+}
+
+function deletePendingFile(id) {
+  return openPendingDB().then(db => new Promise((resolve) => {
+    const tx = db.transaction("files", "readwrite");
+    tx.objectStore("files").delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  }));
+}
+
+function genPendingId() {
+  return `p${Date.now()}${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// Direct unsigned upload to Cloudinary's REST API. Used only at send-time
+// (see handleSendCart / initWhatsappCta) — deliberately not the Cloudinary
+// widget, since the widget uploads the moment a file is picked and we need
+// that to happen later, under our own control.
+function uploadFileToCloudinary(file, folder, resourceType) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  formData.append("folder", folder);
+  const type = resourceType || "image";
+  return fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type}/upload`, {
+    method: "POST",
+    body: formData
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) throw new Error(data.error.message || "Upload failed");
+      return data.secure_url;
+    });
+}
+
+const IMAGE_TYPES = ["image/png", "image/jpeg", "application/pdf"];
+const DOC_TYPES = [
+  "application/pdf", "text/csv", "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+];
+
+// Wires a visible button to a hidden native file input. Picking a file
+// just stores it locally (savePendingFile) and hands the caller back a
+// { id, name, folder, resourceType } reference — nothing is uploaded yet.
+function initDeferredUpload(buttonId, statusId, folder, onSelect, docs) {
   const button = document.getElementById(buttonId);
   const status = document.getElementById(statusId);
-  if (!button || typeof cloudinary === "undefined") return;
+  if (!button) return;
 
-  const widget = cloudinary.createUploadWidget(
-    {
-      cloudName: CLOUDINARY_CLOUD_NAME,
-      uploadPreset: CLOUDINARY_UPLOAD_PRESET,
-      folder: folder,
-      multiple: false,
-      resourceType: "raw",
-      sources: ["local"],
-      maxFileSize: 15000000,
-      clientAllowedFormats: ["pdf", "csv", "xls", "xlsx", "doc", "docx"],
-    },
-    (error, result) => {
-      if (!error && result && result.event === "success") {
-        status.classList.remove("upload-status--error");
-        status.classList.add("upload-status--success");
-        status.textContent = "Uploaded — thanks! We've added a link to it in your WhatsApp message below.";
-        button.textContent = "Upload another document";
-        if (onSuccess) onSuccess(result.info.secure_url);
-        return;
-      }
+  const input = document.createElement("input");
+  input.type = "file";
+  input.hidden = true;
+  input.accept = docs ? ".pdf,.csv,.xls,.xlsx,.doc,.docx" : ".jpg,.jpeg,.png,.pdf";
+  button.insertAdjacentElement("afterend", input);
+  button.addEventListener("click", () => input.click());
 
-      if (!error && result && result.event === "queues-end") {
-        const failed = (result.info && result.info.files || []).find(f => f.status === "error" || f.uploadInfo === undefined && f.status !== "success");
-        if (failed) {
-          status.classList.remove("upload-status--success");
-          status.classList.add("upload-status--error");
-          status.textContent = "That file couldn't be uploaded — please use a PDF, CSV, Excel or Word file under 15MB, then try again.";
-          widget.close();
-        }
-        return;
-      }
+  input.addEventListener("change", () => {
+    const file = input.files[0];
+    if (!file) return;
 
-      if (error) {
-        status.classList.remove("upload-status--success");
-        status.classList.add("upload-status--error");
-        status.textContent = "That file couldn't be uploaded — please use a PDF, CSV, Excel or Word file under 15MB, then try again.";
-        widget.close();
-      }
+    const allowed = docs ? DOC_TYPES : IMAGE_TYPES;
+    const extOk = docs && /\.(csv|xlsx?|docx?)$/i.test(file.name);
+    if ((!allowed.includes(file.type) && !extOk) || file.size > 15000000) {
+      status.classList.remove("upload-status--success");
+      status.classList.add("upload-status--error");
+      status.textContent = docs
+        ? "That file couldn't be used — please use a PDF, CSV, Excel or Word file under 15MB."
+        : "That file couldn't be used — please use a JPG, PNG or PDF under 15MB.";
+      input.value = "";
+      return;
     }
-  );
 
-  button.addEventListener("click", () => widget.open());
+    const id = genPendingId();
+    savePendingFile(id, file).then(() => {
+      status.classList.remove("upload-status--error");
+      status.classList.add("upload-status--success");
+      status.textContent = `"${file.name}" ready — it'll be sent to us once you confirm your quote.`;
+      button.textContent = docs ? "Choose a different document" : "Choose a different image";
+      if (onSelect) onSelect({ id, name: file.name, folder, resourceType: docs ? "raw" : "image" });
+    });
+  });
+}
+
+// Wires the single-item "Find Out More on WhatsApp" button used on
+// standalone product pages (not the cart). If a design was picked,
+// uploads it to Cloudinary first, then opens WhatsApp with the resolved
+// link included; if nothing was picked, the button's already-set href
+// just navigates normally. buildMessage(imageUrl) returns the message text.
+function initWhatsappCta(linkId, buildMessage, getPendingDesign) {
+  const link = document.getElementById(linkId);
+  if (!link) return;
+
+  link.addEventListener("click", (e) => {
+    const pending = getPendingDesign();
+    if (!pending || link.dataset.busy) return;
+    e.preventDefault();
+
+    const original = link.textContent;
+    link.dataset.busy = "1";
+    link.textContent = "Uploading your design…";
+    link.style.pointerEvents = "none";
+
+    getPendingFile(pending.id)
+      .then(file => {
+        if (!file) return null;
+        return uploadFileToCloudinary(file, pending.folder, pending.resourceType).then(url => {
+          return deletePendingFile(pending.id).then(() => url);
+        });
+      })
+      .then(imageUrl => {
+        window.open(whatsappLink(buildMessage(imageUrl)), "_blank", "noopener");
+      })
+      .catch(err => {
+        link.textContent = "Upload failed — tap to try again";
+        console.error(err);
+      })
+      .finally(() => {
+        delete link.dataset.busy;
+        link.style.pointerEvents = "";
+        if (link.textContent === "Uploading your design…") link.textContent = original;
+      });
+  });
 }
 
 function whatsappLink(message) {
@@ -161,6 +222,13 @@ function updateCartBadge() {
   badge.style.display = count > 0 ? "inline-flex" : "none";
 }
 
+// Whatever design was last picked via initDeferredUpload on the current
+// product page — attached to the next item added to the cart. Cleared
+// per page load (a fresh visit shouldn't carry over a design from
+// wherever the customer was before).
+let pendingDesignForCart = null;
+function setPendingImageForCart(info) { pendingDesignForCart = info; }
+
 // Reads the current selection straight off a product page's DOM
 // (title, style code, colour, size, quantity, price, photo) and adds it
 // to the cart — merging into an existing line if the same product/colour/size
@@ -189,8 +257,9 @@ function addCurrentSelectionToCart(statusElId) {
   );
   if (existing) {
     existing.qty = (existing.qty || 1) + qty;
+    if (pendingDesignForCart) existing.pendingImage = pendingDesignForCart;
   } else {
-    cart.push({ title, styleCode, colourName, size, price, image, qty });
+    cart.push({ title, styleCode, colourName, size, price, image, qty, pendingImage: pendingDesignForCart || null });
   }
   saveCart(cart);
 
@@ -277,12 +346,16 @@ function renderCartInto(ids) {
 
   list.innerHTML = cart.map((item, i) => {
     const qty = item.qty || 1;
+    const designNote = item.pendingImage
+      ? `<div class="cart-item-meta" style="color:var(--brass-dark);">Design attached: ${item.pendingImage.name}</div>`
+      : "";
     return `
     <div class="cart-item">
       <img src="${item.image}" alt="${item.title}">
       <div class="cart-item-details">
         <div class="cart-item-title">${item.title} (${item.styleCode})</div>
         <div class="cart-item-meta">Colour: ${item.colourName} &middot; Size: ${item.size}</div>
+        ${designNote}
         <div class="cart-item-qty">
           <button type="button" onclick="updateCartItemQty(${i}, -1)" aria-label="Decrease quantity">&minus;</button>
           <span>${qty}</span>
@@ -334,23 +407,91 @@ function rootPath(path) {
   return isNested ? `../${path}` : path;
 }
 
-// Called when the customer clicks "Send My Cart on WhatsApp". The link's
-// own href/target still open WhatsApp in a new tab as normal; this just
-// clears the cart and takes the current tab to a thank-you page afterwards.
-function handleSendCart() {
-  setTimeout(() => {
-    saveCart([]);
-    window.location.href = rootPath("thank-you.html");
-  }, 400);
+// Called when the customer clicks "Send My Cart on WhatsApp". Uploads any
+// pending design files (per cart item, plus the shared Leavers logo/docs)
+// to Cloudinary first — this is the one moment those files actually leave
+// the browser — then opens WhatsApp with the resolved links included,
+// clears the cart, and moves on to the thank-you page. If an upload fails,
+// the cart is left untouched so the customer can try again.
+function handleSendCart(e) {
+  const link = e.currentTarget;
+  if (link.dataset.busy) return;
+  e.preventDefault();
+
+  const cart = getCart();
+  const leavers = getLeaversDetails();
+  const pendingCount = cart.filter(item => item.pendingImage).length +
+    (leavers.pendingLogo ? 1 : 0) + (leavers.pendingDocs ? 1 : 0);
+
+  const original = link.textContent;
+  if (pendingCount > 0) {
+    link.dataset.busy = "1";
+    link.textContent = `Uploading your design${pendingCount > 1 ? "s" : ""}…`;
+    link.style.pointerEvents = "none";
+  }
+
+  Promise.resolve()
+    .then(async () => {
+      for (const item of cart) {
+        if (!item.pendingImage) continue;
+        const file = await getPendingFile(item.pendingImage.id);
+        if (file) {
+          item.imageUrl = await uploadFileToCloudinary(file, item.pendingImage.folder, item.pendingImage.resourceType);
+          await deletePendingFile(item.pendingImage.id);
+        }
+        delete item.pendingImage;
+      }
+      saveCart(cart);
+
+      if (leavers.pendingLogo) {
+        const file = await getPendingFile(leavers.pendingLogo.id);
+        if (file) {
+          leavers.logoUrl = await uploadFileToCloudinary(file, leavers.pendingLogo.folder, "image");
+          await deletePendingFile(leavers.pendingLogo.id);
+        }
+        delete leavers.pendingLogo;
+      }
+      if (leavers.pendingDocs) {
+        const file = await getPendingFile(leavers.pendingDocs.id);
+        if (file) {
+          leavers.docsUrl = await uploadFileToCloudinary(file, leavers.pendingDocs.folder, "raw");
+          await deletePendingFile(leavers.pendingDocs.id);
+        }
+        delete leavers.pendingDocs;
+      }
+      localStorage.setItem(LEAVERS_KEY, JSON.stringify(leavers));
+
+      window.open(whatsappLink(buildCartMessage(cart)), "_blank", "noopener");
+
+      setTimeout(() => {
+        saveCart([]);
+        window.location.href = rootPath("thank-you.html");
+      }, 400);
+    })
+    .catch(err => {
+      link.textContent = "Upload failed — tap to try again";
+      console.error(err);
+    })
+    .finally(() => {
+      delete link.dataset.busy;
+      link.style.pointerEvents = "";
+      if (link.textContent.startsWith("Uploading your design")) link.textContent = original;
+    });
 }
 
 function buildCartMessage(cart) {
   const lines = cart.map((item, i) => {
     const qty = item.qty || 1;
-    return `${i + 1}. ${item.title} (${item.styleCode}) — Colour: ${item.colourName}, Size: ${item.size}, Qty: ${qty} — £${(item.price * qty).toFixed(2)}`;
+    let line = `${i + 1}. ${item.title} (${item.styleCode}) — Colour: ${item.colourName}, Size: ${item.size}, Qty: ${qty} — £${(item.price * qty).toFixed(2)}`;
+    if (item.imageUrl) {
+      line += `\n   Design: ${item.imageUrl}`;
+    } else if (item.pendingImage) {
+      line += `\n   Design: "${item.pendingImage.name}" (will be sent once you confirm)`;
+    }
+    return line;
   });
   const total = cartTotal(cart).toFixed(2);
-  let msg = `Hi, I'd like to enquire about the following items:\n\n${lines.join("\n")}`;
+  let msg = `Hi, I'd like to enquire about the following items:\n\n${lines.join("\n\n")}`;
 
   const leaversLines = getLeaversDetailsLines();
   if (leaversLines.length) {
@@ -514,7 +655,7 @@ function initCartDrawer() {
           <span>Total</span>
           <span id="drawer-cart-total">£0.00</span>
         </div>
-        <a id="drawer-cart-whatsapp-btn" class="whatsapp-btn whatsapp-btn--large" href="#" target="_blank" rel="noopener" onclick="handleSendCart()" style="width:100%; justify-content:center;">Send My Cart on WhatsApp</a>
+        <a id="drawer-cart-whatsapp-btn" class="whatsapp-btn whatsapp-btn--large" href="#" target="_blank" rel="noopener" onclick="handleSendCart(event)" style="width:100%; justify-content:center;">Send My Cart on WhatsApp</a>
         <button class="clear-cart-btn" type="button" onclick="clearCart()">Empty Cart</button>
       </div>
     </div>

@@ -227,7 +227,48 @@ function updateCartBadge() {
 // per page load (a fresh visit shouldn't carry over a design from
 // wherever the customer was before).
 let pendingDesignForCart = null;
-function setPendingImageForCart(info) { pendingDesignForCart = info; }
+
+// Reads the current colour/size selection straight off a product page's
+// DOM — shared by addCurrentSelectionToCart (to find/merge a matching
+// line) and setPendingImageForCart (to live-update one already in the cart).
+function getCurrentSelectionIdentity() {
+  const codeEl = document.querySelector(".product-details .code");
+  if (!codeEl) return null;
+  const sizeSelect = document.getElementById("size-select");
+  const colourNameEl = document.getElementById("colour-name");
+  return {
+    styleCode: codeEl.textContent.split("-")[0].trim(),
+    colourName: colourNameEl ? colourNameEl.textContent.trim() : "",
+    size: sizeSelect ? sizeSelect.value : "One Size"
+  };
+}
+
+// Called whenever a product page picks (or replaces) a design. If that
+// product/colour/size is already sitting in the cart, updates its design
+// there and then — otherwise a customer who adds to cart, then changes
+// their mind and picks a different image, would have the old image
+// silently stuck on the cart line. Also frees the file it's replacing,
+// since nothing (cart or otherwise) still points at it once swapped.
+function setPendingImageForCart(info) {
+  const previous = pendingDesignForCart;
+  pendingDesignForCart = info;
+
+  const identity = getCurrentSelectionIdentity();
+  if (identity) {
+    const cart = getCart();
+    const existing = cart.find(item =>
+      item.styleCode === identity.styleCode && item.colourName === identity.colourName && item.size === identity.size
+    );
+    if (existing) {
+      existing.pendingImage = info;
+      saveCart(cart);
+    }
+  }
+
+  if (previous && (!info || previous.id !== info.id)) {
+    deletePendingFile(previous.id);
+  }
+}
 
 // Reads the current selection straight off a product page's DOM
 // (title, style code, colour, size, quantity, price, photo) and adds it
@@ -235,17 +276,13 @@ function setPendingImageForCart(info) { pendingDesignForCart = info; }
 // combination is already there, rather than creating a duplicate line.
 function addCurrentSelectionToCart(statusElId) {
   const h1 = document.querySelector(".product-details h1");
-  const codeEl = document.querySelector(".product-details .code");
   const photo = document.getElementById("product-photo");
   const priceEl = document.querySelector(".product-details .price");
-  const sizeSelect = document.getElementById("size-select");
-  const colourNameEl = document.getElementById("colour-name");
   const qtyInput = document.getElementById("qty-input");
 
+  const identity = getCurrentSelectionIdentity() || { styleCode: "", colourName: "", size: "One Size" };
+  const { styleCode, colourName, size } = identity;
   const title = h1 ? h1.textContent.trim() : "Item";
-  const styleCode = codeEl ? codeEl.textContent.split("-")[0].trim() : "";
-  const colourName = colourNameEl ? colourNameEl.textContent.trim() : "";
-  const size = sizeSelect ? sizeSelect.value : "One Size";
   const priceText = priceEl ? priceEl.textContent.trim() : "£0.00";
   const price = parseFloat(priceText.replace(/[^0-9.]/g, "")) || 0;
   const image = photo ? photo.src : "";

@@ -326,11 +326,12 @@ function renderCartUI() {
   renderCartDrawer();
 }
 
-// Collections pages live one folder down (/collections/...), everything
-// else is at the site root — this resolves a root-relative path from
-// either location.
+// Collections and products pages live one folder down (/collections/...,
+// /products/...), everything else is at the site root — this resolves a
+// root-relative path from any of those locations.
 function rootPath(path) {
-  return window.location.pathname.includes("/collections/") ? `../${path}` : path;
+  const isNested = window.location.pathname.includes("/collections/") || window.location.pathname.includes("/products/");
+  return isNested ? `../${path}` : path;
 }
 
 // Called when the customer clicks "Send My Cart on WhatsApp". The link's

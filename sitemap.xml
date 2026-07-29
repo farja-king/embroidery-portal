@@ -58,6 +58,22 @@
   </url>
 
   <url>
+    <loc>https://embroidery.click/products/at001.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://embroidery.click/products/at002.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://embroidery.click/products/at003.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
     <loc>https://embroidery.click/products/bb10.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

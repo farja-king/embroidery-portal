@@ -84,6 +84,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://embroidery.click/products/custom-printed-tshirt.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://embroidery.click/products/rs232m.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

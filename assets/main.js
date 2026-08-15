@@ -170,6 +170,39 @@ function whatsappLink(message) {
   return `${base}?text=${encodeURIComponent(text)}`;
 }
 
+// ---- Broken image fallback ----
+// Product photos, colour swatches and card thumbnails all come straight
+// from the supplier's CDN (fullcollection.com) — occasionally a file goes
+// missing or gets locked down on their end (seen on AT001 Cornflower Blue,
+// Aug 2026) and would otherwise leave a blank/broken image. Swap those for
+// a neutral placeholder instead of leaving the broken-image state.
+const IMAGE_FALLBACK_SRC = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f2ece1'/%3E%3Cg fill='none' stroke='%23cabfa9' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='40' y='55' width='120' height='90' rx='6'/%3E%3Ccircle cx='75' cy='85' r='10'/%3E%3Cpath d='M40 130 L80 100 L110 122 L140 95 L160 115'/%3E%3C/g%3E%3C/svg%3E";
+
+// Delegated on the capture phase, since the "error" event doesn't bubble —
+// this catches every <img> on the site (product photo, collection cards,
+// cart items) from one place, including ones added after this script runs.
+window.addEventListener("error", (e) => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement) || img.src === IMAGE_FALLBACK_SRC) return;
+  img.src = IMAGE_FALLBACK_SRC;
+}, true);
+
+// Colour swatches are painted via a CSS background-image rather than an
+// <img>, so a failed load never fires an "error" event at all — probe each
+// one directly instead. Runs on DOMContentLoaded because swatches are built
+// by each product page's own inline script, which executes after this file
+// but before that event fires.
+function initSwatchImageFallbacks() {
+  document.querySelectorAll(".swatch").forEach(btn => {
+    const match = btn.style.backgroundImage.match(/^url\(["']?(.*?)["']?\)$/);
+    if (!match || match[1] === IMAGE_FALLBACK_SRC) return;
+    const probe = new Image();
+    probe.onerror = () => { btn.style.backgroundImage = `url("${IMAGE_FALLBACK_SRC}")`; };
+    probe.src = match[1];
+  });
+}
+document.addEventListener("DOMContentLoaded", initSwatchImageFallbacks);
+
 // Product tiles: show a random colourway on load (never just black), then
 // cycle through the rest on hover.
 function initProductCardCarousels() {

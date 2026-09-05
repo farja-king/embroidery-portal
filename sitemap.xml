@@ -200,7 +200,12 @@
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://embroidery.click/products/001m.html</loc>
+    <loc>https://embroidery.click/products/uc601.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://embroidery.click/products/bb45.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

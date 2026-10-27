@@ -57,6 +57,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://embroidery.click/collections/legs-category.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://embroidery.click/collections/polos-category.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
